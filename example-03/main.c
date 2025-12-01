@@ -3,7 +3,7 @@
 #include <stdio.h>      // printf(), perror()
 #include <unistd.h>     // read(), write(), lseek(), close()
 #include <sys/types.h>  // types used by open() and lseek()
-#include <sys/stat.h>   // file mode bits (not heavily used here)
+#include <sys/stat.h>   // file mode bits
 #include <fcntl.h>      // open() and file access flags
 
 int main(void) {
