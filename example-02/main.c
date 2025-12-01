@@ -3,7 +3,7 @@
 #include <stdio.h>      // printf(), perror()
 #include <unistd.h>     // read(), write(), close()
 #include <sys/types.h>  // types used by open()
-#include <sys/stat.h>   // for file permission bits (not heavily used here)
+#include <sys/stat.h>   // for file permission bits
 #include <fcntl.h>      // open() and file access flags
 
 int main(void) {
