@@ -35,7 +35,7 @@ int main(void) {
         printf("Parent: Child created with PID: %d\n", pid);
         printf("Parent: Waiting for child to complete...\n");
 
-        // wait for any child to terminate
+        // wait for child to terminate
         child_pid = wait(&status);
 
         if (child_pid == -1) {
@@ -45,7 +45,7 @@ int main(void) {
 
         printf("Parent: Child with PID %d has completed.\n", child_pid);
 
-        // check how child terminated
+        // check whether child exited normally
         if (WIFEXITED(status)) {
             int exit_status = WEXITSTATUS(status);
             printf("Parent: Child exited normally with status: %d\n", exit_status);
