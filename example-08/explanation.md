@@ -1,43 +1,79 @@
-# Example 08 – Zombie Process Program
-## Purpose
-The purpose of this example is to demonstrate how a **zombie process** is created in Linux.  
-A zombie process is a child process that has terminated, but its entry still remains in the process table because the parent has not yet called `wait()` (or has not terminated).
-## System Calls / Functions Used
-- `pid_t fork(void)` from `<unistd.h>` – creates a new child process.
-- `pid_t getpid(void)` from `<unistd.h>` – returns the PID (process ID) of the calling process.
-- `pid_t getppid(void)` from `<unistd.h>` – returns the PPID (parent process ID) of the calling process.
-- `unsigned int sleep(unsigned int seconds)` from `<unistd.h>` – suspends execution for a given number of seconds.
-- `printf()` and `perror()` from `<stdio.h>`.
-## How It Works
-- The program first prints the PID of the original process (which will act as the parent):
-  ```c
-  printf("Parent (before fork) PID = %d\n", getpid());
-Then it calls:
-pid = fork();
+Example 08 – Zombie Process Program
+Purpose
+
+This example demonstrates how a zombie process is created in Linux.
+A zombie process is a child process that has finished execution but still has an entry in the process table because its parent has not yet called wait().
+
+System Calls / Functions Used
+
+fork() – creates a new child process.
+
+getpid() – returns the process ID of the calling process.
+
+getppid() – returns the parent process ID.
+
+sleep() – pauses execution for a certain time.
+
+printf() / perror() – for printing messages and errors.
+
+How It Works
+
+The parent process prints its PID before creating a child:
+
+printf("Parent (before fork) PID = %d\n", getpid());
+
+
+The program calls fork():
+
 In the child process, fork() returns 0.
-In the parent process, fork() returns the child's PID (a positive value).
-Child process block (pid == 0):
-Prints its own PID and its parent's PID:
-printf("[Child]  PID  = %d\n", getpid());
-printf("[Child]  My parent PID (PPID) = %d\n", getppid());
-Exits immediately using return 0; (or exit(0);).
-At this point, the child process has finished execution.
-Parent process block (pid > 0):
-Prints its own PID and the child's PID.
-Does not call wait(). Instead, it calls:
-sleep(20);
-This keeps the parent process alive for 20 seconds.
-During this sleep period, the child has already terminated, but since the parent has not yet called wait(), the child's entry remains in the process table as a zombie.
-If we run ps -l in another terminal during this time, the child process will appear with state Z or marked as defunct.
-After the sleep finishes, the parent prints a final message and exits.
-Once the parent terminates, the zombie entry is removed from the process table.
-How to Compile and Run
-gcc main.c -o app
-./app
-Optional (to observe the zombie process visually):
-Run the program in the background:
+
+In the parent process, fork() returns the PID of the child.
+
+Child process (pid == 0):
+
+Prints its PID and its parent’s PID:
+
+printf("[Child] PID = %d\n", getpid());
+printf("[Child] My parent PID (PPID) = %d\n", getppid());
+
+
+Exits immediately using exit(0);.
+
+At this point, the child process is terminated, but its entry remains in the process table because the parent hasn’t called wait().
+
+Parent process (pid > 0):
+
+Prints its own PID and the child’s PID.
+
+Does not call wait().
+
+Sleeps for 20 seconds using sleep(20); to keep itself alive.
+
+During this time, the child appears in the process table as a zombie process (state Z or defunct).
+
+After sleep, the parent prints a final message and exits.
+
+When the parent terminates, the zombie entry is automatically removed from the process table.
+
+Observing the Zombie Process
+
+Compile and run:
+
 gcc main.c -o app
 ./app &
-While the parent is sleeping, run:
+
+
+While the parent is sleeping, open another terminal and run:
+
 ps -l
-Observe that the child process appears with state Z (zombie) or is marked as defunct.
+
+
+You will see the child process marked as Z (zombie) or <defunct>.
+
+Key Points
+
+Zombie processes do not consume CPU but occupy entries in the process table.
+
+They exist only until the parent calls wait() or terminates.
+
+Proper process management should always wait() for children to avoid zombies.
