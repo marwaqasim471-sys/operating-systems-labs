@@ -1,51 +1,80 @@
-#  Example 06 – wait() System Call
+Example 06 – wait() System Call
+Purpose
 
-## Purpose
-The purpose of this example is to demonstrate how the `wait()` system call is used by a parent process to wait for its child process to finish.  
-It shows basic process synchronization and how the parent can obtain the child's exit status.
+This example demonstrates how the wait() system call is used by a parent process to pause execution until its child process finishes.
+It also shows how the parent can retrieve the exit status of the child process, providing a simple form of process synchronization.
 
-## System Calls / Functions Used
-- `pid_t fork(void)` from `<unistd.h>` – creates a new child process.
-- `pid_t wait(int *status)` from `<sys/wait.h>` – waits for a child process to terminate.
-- `pid_t getpid(void)` from `<unistd.h>` – returns the process ID of the calling process.
-- `unsigned int sleep(unsigned int seconds)` from `<unistd.h>` – suspends execution for a given number of seconds.
-- `void exit(int status)` from `<stdlib.h>` – terminates the calling process with the given exit status.
-- `printf()` and `perror()` from `<stdio.h>`.
+System Calls / Functions Used
 
-## How It Works
-- The program first prints the PID of the parent process:
-  ```c
-  printf("Parent: Before fork - PID: %d\n", getpid());
-Then it calls:
+pid_t fork(void) from <unistd.h> – creates a new child process
+
+pid_t wait(int *status) from <sys/wait.h> – causes the parent to wait for a child to terminate
+
+pid_t getpid(void) from <unistd.h> – gets the PID of the current process
+
+unsigned int sleep(unsigned int seconds) from <unistd.h> – suspends execution
+
+void exit(int status) from <stdlib.h> – terminates a process with a status code
+
+printf() and perror() from <stdio.h> – output and error handling
+
+How It Works
+1. Parent prints its PID
+printf("Parent: Before fork - PID: %d\n", getpid());
+
+2. Process creation
 pid = fork();
-In the child process, fork() returns 0.
-In the parent process, fork() returns the child's PID (a positive value).
-Child process block (pid == 0):
-Prints its own PID.
-Simulates some work using sleep(3);.
-Calls exit(5); to terminate with exit status 5.
-Parent process block (pid > 0):
-Prints the PID of the created child.
-Calls:
+
+
+Child process: fork() returns 0
+
+Parent process: fork() returns the child PID (positive number)
+
+Child Process Block (pid == 0)
+
+The child process:
+
+Prints its PID
+
+Simulates work using:
+
+sleep(3);
+
+
+Terminates with exit code 5:
+
+exit(5);
+
+Parent Process Block (pid > 0)
+
+The parent process:
+
+Prints the child PID
+
+Waits for the child process to finish:
+
 child_pid = wait(&status);
-This suspends the parent until one of its child processes terminates.
-After wait() returns:
-child_pid contains the PID of the terminated child.
-status contains information about how the child terminated.
-The parent checks:if (WIFEXITED(status)) {
+
+
+When wait() returns:
+
+child_pid contains the PID of the finished child
+
+status contains termination details
+
+Checks whether the child exited normally:
+
+if (WIFEXITED(status)) {
     int exit_status = WEXITSTATUS(status);
     printf("Parent: Child exited normally with status: %d\n", exit_status);
 }
-This confirms that the child exited normally and prints its exit status (in this example, 5).
-Finally, the parent prints a message and exits.This confirms that the child exited normally and prints its exit status (in this example, 5).
-Finally, the parent prints a message and exits.
+
+
+Prints a final message and exits.
+
 How to Compile and Run
+1. Compile
 gcc main.c -o app
-./app
-Steps:
-1.Navigate to the directory:
-cd example-06
-2.Compile the program:
-gcc main.c -o app
-3.Run the program:
+
+2. Run
 ./app
